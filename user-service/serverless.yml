@@ -1,0 +1,45 @@
+service: user-service
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  signup:
+    handler: app/handler.Signup
+    events:
+      - httpApi:
+          path: /signup
+          method: post
+  login:
+    handler: app/handler.Login
+    events:
+      - httpApi:
+          path: /login
+          method: post
+  verify:
+    handler: app/handler.Verify
+    events:
+      - httpApi:
+          path: /verify
+          method: get
+      - httpApi:
+          path: /verify
+          method: post
+  profile:
+    handler: app/handler.Profile
+    events:
+      - httpApi:
+          path: /user
+          method: post
+      - httpApi:
+          path: /user
+          method: put
+      - httpApi:
+          path: /user
+          method: get
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript

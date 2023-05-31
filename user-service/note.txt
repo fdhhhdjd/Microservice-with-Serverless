@@ -1,0 +1,22 @@
+1. Download
+- https://aws.amazon.com/cli/
+
+2. Install serverLess
+- https://www.serverless.com/framework/docs/getting-started
+- npm install -g serverless
+
+3. Create Function lambda in Aws
+
+4. npm init --y
+
+5. sls plugin install --name serverless-offline
+
+6. sls plugin install --name serverless-plugin-typescript
+
+7. tsc --init
+
+8. npm install --dev typescript ts-node
+
+9. npm install aws-lambda
+
+10. npm install --dev @types/aws-lambda

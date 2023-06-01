@@ -20,3 +20,21 @@
 9. npm install aws-lambda
 
 10. npm install --dev @types/aws-lambda
+
+11. npm install --save @middy/core
+
+12. npm install --save-dev @types/aws-lambda
+
+13. npm install --save @middy/http-json-body-parser
+
+14. npm i class-validator
+
+15. npm i tsyringe reflect-metadata
+
+16. npm i class-transformer
+
+17. aws configure
+
+18. npm i --save-dev @types/jsonwebtoken @types/bcrypt
+
+19. npm i --save-dev @types/pg

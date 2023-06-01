@@ -24,9 +24,12 @@ const class_transformer_1 = require("class-transformer");
 //! UTILS
 const errors_1 = require("../utility/errors");
 const response_1 = require("../utility/response");
-const userRepository_1 = require("../repository/userRepository");
-const SignupInput_1 = require("../models/dto/SignupInput");
 const passsword_1 = require("../utility/passsword");
+//! REPOSITORIES
+const userRepository_1 = require("../repository/userRepository");
+//! MODELS
+const SignupInput_1 = require("../models/dto/SignupInput");
+const LoginInput_1 = require("../models/dto/LoginInput");
 let UserService = class UserService {
     constructor(repository) {
         this.repository = repository;
@@ -60,6 +63,17 @@ let UserService = class UserService {
     UserLogin(event) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const input = (0, class_transformer_1.plainToClass)(LoginInput_1.LoginInput, event.body);
+                const error = yield (0, errors_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(404, error);
+                const data = yield this.repository.findAccount(input.email);
+                const verified = yield (0, passsword_1.ValidatePassword)(input.password, data.password, data.salt);
+                if (!verified) {
+                    throw new Error("password does not match!");
+                }
+                const token = (0, passsword_1.GetToken)(data);
+                return (0, response_1.SuccessResponse)({ token });
             }
             catch (error) {
                 console.log(error);

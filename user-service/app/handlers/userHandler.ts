@@ -16,8 +16,8 @@ const service = container.resolve(UserService);
 /**
 * @author Nguyễn Tiến Tài
 * @created_at 01/06/2023
-* @param {String} phone - User name admin
-* @param {String} email - Password admin
+* @param {String} phone - Phone 
+* @param {String} email - Email
 * @param {String} password - Password admin
 * @param {Object} res - response
 * @returns {Object} data - return data {}
@@ -32,6 +32,21 @@ const service = container.resolve(UserService);
 */
 export const Signup = middy((event: APIGatewayProxyEventV2) => {
   return service.CreateUser(event);
+}).use(bodyParser());
+
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 01/06/2023
+* @param {String} email - Email
+* @param {String} password - Password
+* @param {Object} res - response
+* @returns {Object} data - return data {}
+* @returns {String} data.token - return eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMiIsImVtYWlsIjoibmd1eWVudGllbnRhaTExQGdtYWlsLmNvbSIsInBob25lIjoiMDc5ODgwNTc0MSIsImlhdCI6MTY4NTYwNzQ5NCwiZXhwIjoxNjg4MTk5NDk0fQ.cAX77Z3Ifb57o1Xa8MsGm_4U1PBjS06cx_63IS-eL44
+* @returns {String} message - return success
+* @description Login account
+*/
+export const Login = middy((event: APIGatewayProxyEventV2) => {
+  return service.UserLogin(event);
 }).use(bodyParser());
 
 

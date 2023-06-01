@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Payment = exports.Cart = exports.Profile = exports.Verify = exports.Signup = void 0;
+exports.Payment = exports.Cart = exports.Profile = exports.Verify = exports.Login = exports.Signup = void 0;
 const core_1 = __importDefault(require("@middy/core"));
 const http_json_body_parser_1 = __importDefault(require("@middy/http-json-body-parser"));
 const tsyringe_1 = require("tsyringe");
@@ -24,8 +24,8 @@ const service = tsyringe_1.container.resolve(userService_1.UserService);
 /**
 * @author Nguyễn Tiến Tài
 * @created_at 01/06/2023
-* @param {String} phone - User name admin
-* @param {String} email - Password admin
+* @param {String} phone - Phone
+* @param {String} email - Email
 * @param {String} password - Password admin
 * @param {Object} res - response
 * @returns {Object} data - return data {}
@@ -40,6 +40,20 @@ const service = tsyringe_1.container.resolve(userService_1.UserService);
 */
 exports.Signup = (0, core_1.default)((event) => {
     return service.CreateUser(event);
+}).use((0, http_json_body_parser_1.default)());
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 01/06/2023
+* @param {String} email - Email
+* @param {String} password - Password
+* @param {Object} res - response
+* @returns {Object} data - return data {}
+* @returns {String} data.token - return eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMiIsImVtYWlsIjoibmd1eWVudGllbnRhaTExQGdtYWlsLmNvbSIsInBob25lIjoiMDc5ODgwNTc0MSIsImlhdCI6MTY4NTYwNzQ5NCwiZXhwIjoxNjg4MTk5NDk0fQ.cAX77Z3Ifb57o1Xa8MsGm_4U1PBjS06cx_63IS-eL44
+* @returns {String} message - return success
+* @description Login account
+*/
+exports.Login = (0, core_1.default)((event) => {
+    return service.UserLogin(event);
 }).use((0, http_json_body_parser_1.default)());
 const Verify = (event) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(event);

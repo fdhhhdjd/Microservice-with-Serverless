@@ -14,6 +14,7 @@ exports.UserRepository = void 0;
 const databaseClient_1 = require("../utility/databaseClient");
 class UserRepository {
     constructor() { }
+    // Create account
     createAccount({ phone, email, password, salt, userType }) {
         return __awaiter(this, void 0, void 0, function* () {
             const client = yield (0, databaseClient_1.DBClient)();
@@ -25,6 +26,21 @@ class UserRepository {
             if (result.rowCount > 0) {
                 return result.rows[0];
             }
+        });
+    }
+    // Find Account
+    findAccount(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const client = yield (0, databaseClient_1.DBClient)();
+            yield client.connect();
+            const queryString = "SELECT user_id, email, password, phone, salt FROM users WHERE email = $1";
+            const values = [email];
+            const result = yield client.query(queryString, values);
+            yield client.end();
+            if (result.rowCount < 1) {
+                throw new Error("user does not exist with provided email id!");
+            }
+            return result.rows[0];
         });
     }
 }

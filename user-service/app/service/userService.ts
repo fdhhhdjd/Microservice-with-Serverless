@@ -6,9 +6,14 @@ import { plainToClass } from "class-transformer";
 //! UTILS
 import { AppValidationError } from "../utility/errors";
 import { ErrorResponse, SuccessResponse } from "../utility/response";
+import { GetSalt,GetHashedPassword, GetToken, ValidatePassword} from "../utility/passsword";
+
+//! REPOSITORIES
 import { UserRepository } from "../repository/userRepository";
+
+//! MODELS
 import { SignupInput } from "../models/dto/SignupInput";
-import { GetSalt,GetHashedPassword} from "../utility/passsword";
+import { LoginInput } from "../models/dto/LoginInput";
 
 @autoInjectable()
 export class UserService {
@@ -44,6 +49,21 @@ export class UserService {
   // User Login
   async UserLogin(event: APIGatewayProxyEventV2) {
     try {
+      const input = plainToClass(LoginInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(404, error);
+      const data = await this.repository.findAccount(input.email);
+      const verified = await ValidatePassword(
+        input.password,
+        data.password,
+        data.salt
+      );
+      if (!verified) {
+        throw new Error("password does not match!");
+      }
+      const token = GetToken(data);
+
+      return SuccessResponse({ token });
     } catch (error) {
       console.log(error);
       return ErrorResponse(500, error);

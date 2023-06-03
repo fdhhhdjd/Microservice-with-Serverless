@@ -2,7 +2,6 @@ import twilio from "twilio";
 
 const accountSid = process.env.ACCOUNT_SID_KEY;
 const authToken = process.env.AUTH_TOKEN_KEY;
-console.log(accountSid);
 const client = twilio(accountSid, authToken);
 
 export const GenerateAccessCode = () => {

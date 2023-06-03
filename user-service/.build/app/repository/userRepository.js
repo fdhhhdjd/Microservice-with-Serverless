@@ -38,10 +38,23 @@ class UserRepository extends dbOperation_1.DBOperation {
             return result.rows[0];
         });
     }
+    // Update Verification 
     updateVerificationCode(userId, code, expiry) {
         return __awaiter(this, void 0, void 0, function* () {
             const queryString = "UPDATE users SET verification_code=$1, expiry=$2 WHERE user_id=$3 AND verified=FALSE RETURNING *";
             const values = [code, expiry, userId];
+            const result = yield this.executeQuery(queryString, values);
+            if (result.rowCount > 0) {
+                return result.rows[0];
+            }
+            throw new Error("user already verified!");
+        });
+    }
+    // Update Verification user
+    updateVerifyUser(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const queryString = "UPDATE users SET verified=TRUE WHERE user_id=$1 AND verified=FALSE RETURNING *";
+            const values = [userId];
             const result = yield this.executeQuery(queryString, values);
             if (result.rowCount > 0) {
                 return result.rows[0];

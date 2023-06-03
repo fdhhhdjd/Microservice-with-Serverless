@@ -41,4 +41,16 @@ export class UserRepository extends DBOperation {
     }
     throw new Error("user already verified!");
   }
+
+  // Update Verification user
+  async updateVerifyUser(userId: number) {
+    const queryString =
+      "UPDATE users SET verified=TRUE WHERE user_id=$1 AND verified=FALSE RETURNING *";
+    const values = [userId];
+    const result = await this.executeQuery(queryString, values);
+    if (result.rowCount > 0) {
+      return result.rows[0] as UserModel;
+    }
+    throw new Error("user already verified!");
+  }
 }

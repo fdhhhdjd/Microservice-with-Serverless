@@ -16,7 +16,6 @@ exports.SendVerificationCode = exports.GenerateAccessCode = void 0;
 const twilio_1 = __importDefault(require("twilio"));
 const accountSid = process.env.ACCOUNT_SID_KEY;
 const authToken = process.env.AUTH_TOKEN_KEY;
-console.log(accountSid);
 const client = (0, twilio_1.default)(accountSid, authToken);
 const GenerateAccessCode = () => {
     const code = Math.floor(10000 + Math.random() * 900000);

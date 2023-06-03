@@ -26,11 +26,13 @@ const errors_1 = require("../utility/errors");
 const response_1 = require("../utility/response");
 const passsword_1 = require("../utility/passsword");
 const notification_1 = require("../utility/notification");
+const dateHelper_1 = require("../utility/dateHelper");
 //! REPOSITORIES
 const userRepository_1 = require("../repository/userRepository");
 //! MODELS
 const SignupInput_1 = require("../models/dto/SignupInput");
 const LoginInput_1 = require("../models/dto/LoginInput");
+const UpdateInput_1 = require("../models/dto/UpdateInput");
 let UserService = class UserService {
     constructor(repository) {
         this.repository = repository;
@@ -86,11 +88,11 @@ let UserService = class UserService {
     GetVerificationToken(event) {
         return __awaiter(this, void 0, void 0, function* () {
             const token = event.headers.authorization;
-            console.log(token, 'token');
+            console.log(token, "token");
             const payload = yield (0, passsword_1.VerifyToken)(token);
             if (!payload)
                 return (0, response_1.ErrorResponse)(403, "authorization failed!");
-            console.log(payload, 'payload');
+            console.log(payload, "payload");
             const { code, expiry } = (0, notification_1.GenerateAccessCode)();
             yield this.repository.updateVerificationCode(payload.user_id, code, expiry);
             // await SendVerificationCode(code, payload.phone);
@@ -99,9 +101,34 @@ let UserService = class UserService {
             });
         });
     }
+    // Get verification user
     VerifyUser(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from Verify User" });
+            const token = event.headers.authorization;
+            const payload = yield (0, passsword_1.VerifyToken)(token);
+            if (!payload)
+                return (0, response_1.ErrorResponse)(403, "authorization failed!");
+            const input = (0, class_transformer_1.plainToClass)(UpdateInput_1.VerificationInput, event.body);
+            const error = yield (0, errors_1.AppValidationError)(input);
+            if (error)
+                return (0, response_1.ErrorResponse)(404, error);
+            const { verification_code, expiry } = yield this.repository.findAccount(payload.email);
+            console.log(verification_code, 'verification_code');
+            // find the user account
+            if (verification_code === parseInt(input.code)) {
+                // check expiry
+                const currentTime = new Date();
+                const diff = (0, dateHelper_1.TimeDifference)(expiry, currentTime.toISOString(), "m");
+                console.log("time diff", diff);
+                if (diff > 0) {
+                    console.log("verified successfully!");
+                    yield this.repository.updateVerifyUser(payload.user_id);
+                }
+                else {
+                    return (0, response_1.ErrorResponse)(403, "verification code is expired!");
+                }
+            }
+            return (0, response_1.SuccessResponse)({ message: "user verified!" });
         });
     }
     // User profile

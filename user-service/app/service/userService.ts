@@ -1,4 +1,4 @@
-//! LIBRARY 
+//! LIBRARY
 import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { autoInjectable } from "tsyringe";
 import { plainToClass } from "class-transformer";
@@ -6,8 +6,18 @@ import { plainToClass } from "class-transformer";
 //! UTILS
 import { AppValidationError } from "../utility/errors";
 import { ErrorResponse, SuccessResponse } from "../utility/response";
-import { GetSalt,GetHashedPassword, GetToken, ValidatePassword, VerifyToken} from "../utility/passsword";
-import { GenerateAccessCode, SendVerificationCode } from "../utility/notification";
+import {
+  GetSalt,
+  GetHashedPassword,
+  GetToken,
+  ValidatePassword,
+  VerifyToken,
+} from "../utility/passsword";
+import {
+  GenerateAccessCode,
+  SendVerificationCode,
+} from "../utility/notification";
+import { TimeDifference } from "../utility/dateHelper";
 
 //! REPOSITORIES
 import { UserRepository } from "../repository/userRepository";
@@ -15,6 +25,7 @@ import { UserRepository } from "../repository/userRepository";
 //! MODELS
 import { SignupInput } from "../models/dto/SignupInput";
 import { LoginInput } from "../models/dto/LoginInput";
+import { VerificationInput } from "../models/dto/UpdateInput";
 
 @autoInjectable()
 export class UserService {
@@ -74,11 +85,11 @@ export class UserService {
   // Get verification token
   async GetVerificationToken(event: APIGatewayProxyEventV2) {
     const token = event.headers.authorization;
-    console.log(token,'token');
+    console.log(token, "token");
     const payload = await VerifyToken(token);
 
     if (!payload) return ErrorResponse(403, "authorization failed!");
-    console.log(payload,'payload');
+    console.log(payload, "payload");
 
     const { code, expiry } = GenerateAccessCode();
     await this.repository.updateVerificationCode(payload.user_id, code, expiry);
@@ -90,8 +101,35 @@ export class UserService {
     });
   }
 
+  // Get verification user
   async VerifyUser(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from Verify User" });
+    const token = event.headers.authorization;
+    const payload = await VerifyToken(token);
+    if (!payload) return ErrorResponse(403, "authorization failed!");
+
+    const input = plainToClass(VerificationInput, event.body);
+    const error = await AppValidationError(input);
+    if (error) return ErrorResponse(404, error);
+
+    const { verification_code, expiry } = await this.repository.findAccount(
+      payload.email
+    );
+    console.log(verification_code, 'verification_code');
+    // find the user account
+    if (verification_code === parseInt(input.code)) {
+      // check expiry
+      const currentTime = new Date();
+      const diff = TimeDifference(expiry, currentTime.toISOString(), "m");
+      console.log("time diff", diff);
+
+      if (diff > 0) {
+        console.log("verified successfully!");
+        await this.repository.updateVerifyUser(payload.user_id);
+      } else {
+        return ErrorResponse(403, "verification code is expired!");
+      }
+    }
+    return SuccessResponse({ message: "user verified!" });
   }
 
   // User profile

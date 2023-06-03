@@ -1,7 +1,9 @@
-version: "3.9"
+version: '3.9'
 services:
   postgres:
-    image: postgres:12
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     environment:
       - POSTGRES_PASSWORD=root
@@ -11,7 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
-
+      - ./migrations/sqls/:/docker-entrypoint-initdb.d/
 volumes:
   db:
     driver: local

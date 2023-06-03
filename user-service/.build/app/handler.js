@@ -16,6 +16,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 //! LIBRARY
 require("reflect-metadata");
+require("dotenv/config");
 //! IMPORT GENERAL
 __exportStar(require("./handlers/userHandler"), exports);
 //# sourceMappingURL=handler.js.map

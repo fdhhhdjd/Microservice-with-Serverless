@@ -25,6 +25,7 @@ const class_transformer_1 = require("class-transformer");
 const errors_1 = require("../utility/errors");
 const response_1 = require("../utility/response");
 const passsword_1 = require("../utility/passsword");
+const notification_1 = require("../utility/notification");
 //! REPOSITORIES
 const userRepository_1 = require("../repository/userRepository");
 //! MODELS
@@ -81,14 +82,21 @@ let UserService = class UserService {
             }
         });
     }
+    // Get verification token
     GetVerificationToken(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-            }
-            catch (error) {
-                console.log(error);
-                return (0, response_1.ErrorResponse)(500, error);
-            }
+            const token = event.headers.authorization;
+            console.log(token, 'token');
+            const payload = yield (0, passsword_1.VerifyToken)(token);
+            if (!payload)
+                return (0, response_1.ErrorResponse)(403, "authorization failed!");
+            console.log(payload, 'payload');
+            const { code, expiry } = (0, notification_1.GenerateAccessCode)();
+            yield this.repository.updateVerificationCode(payload.user_id, code, expiry);
+            // await SendVerificationCode(code, payload.phone);
+            return (0, response_1.SuccessResponse)({
+                message: "verification code is sent to your registered mobile number!",
+            });
         });
     }
     VerifyUser(event) {

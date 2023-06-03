@@ -56,17 +56,16 @@ exports.Login = (0, core_1.default)((event) => {
     return service.UserLogin(event);
 }).use((0, http_json_body_parser_1.default)());
 const Verify = (event) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(event);
-    return {
-        statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify({
-            message: "response from Sign Up",
-            data: {},
-        }),
-    };
+    const httpMethod = event.requestContext.http.method.toLowerCase();
+    if (httpMethod === "post") {
+        return service.VerifyUser(event);
+    }
+    else if (httpMethod === "get") {
+        return service.GetVerificationToken(event);
+    }
+    else {
+        return (0, response_1.ErrorResponse)(404, "requested method is not supported!");
+    }
 });
 exports.Verify = Verify;
 const Profile = (event) => __awaiter(void 0, void 0, void 0, function* () {

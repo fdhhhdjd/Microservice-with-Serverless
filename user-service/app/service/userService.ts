@@ -6,7 +6,8 @@ import { plainToClass } from "class-transformer";
 //! UTILS
 import { AppValidationError } from "../utility/errors";
 import { ErrorResponse, SuccessResponse } from "../utility/response";
-import { GetSalt,GetHashedPassword, GetToken, ValidatePassword} from "../utility/passsword";
+import { GetSalt,GetHashedPassword, GetToken, ValidatePassword, VerifyToken} from "../utility/passsword";
+import { GenerateAccessCode, SendVerificationCode } from "../utility/notification";
 
 //! REPOSITORIES
 import { UserRepository } from "../repository/userRepository";
@@ -70,12 +71,23 @@ export class UserService {
     }
   }
 
+  // Get verification token
   async GetVerificationToken(event: APIGatewayProxyEventV2) {
-    try {
-    } catch (error) {
-      console.log(error);
-      return ErrorResponse(500, error);
-    }
+    const token = event.headers.authorization;
+    console.log(token,'token');
+    const payload = await VerifyToken(token);
+
+    if (!payload) return ErrorResponse(403, "authorization failed!");
+    console.log(payload,'payload');
+
+    const { code, expiry } = GenerateAccessCode();
+    await this.repository.updateVerificationCode(payload.user_id, code, expiry);
+
+    // await SendVerificationCode(code, payload.phone);
+
+    return SuccessResponse({
+      message: "verification code is sent to your registered mobile number!",
+    });
   }
 
   async VerifyUser(event: APIGatewayProxyEventV2) {

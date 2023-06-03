@@ -30,6 +30,7 @@ export class UserRepository extends DBOperation {
     return result.rows[0] as UserModel;
   }
 
+  // Update Verification 
   async updateVerificationCode(userId: number, code: number, expiry: Date) {
     const queryString =
       "UPDATE users SET verification_code=$1, expiry=$2 WHERE user_id=$3 AND verified=FALSE RETURNING *";

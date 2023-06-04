@@ -1,3 +1,4 @@
+//! LIBRARY
 import { Length } from "class-validator";
 
 export class AddressInput {

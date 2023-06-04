@@ -40,3 +40,17 @@
 19. npm i --save-dev @types/pg
 
 20. npm install twilio
+
+21. npm install -g aws-cdk
+
+### Product
+
+22. cdk init app --language=typescript
+
+23. cdk bootstrap
+
+24. cdk synth
+
+25. cdk deploy --verbose --trance
+
+26. cdk destroy --verbos

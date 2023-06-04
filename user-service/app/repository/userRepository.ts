@@ -1,7 +1,9 @@
-//! MODELS
-import { ProfileInput } from "app/models/dto/AddressInput";
-import { UserModel } from "../models/UserModel";
+//! DATABASE
 import { DBOperation } from "./dbOperation";
+
+//! MODELS
+import { ProfileInput } from "..//models/dto/AddressInput";
+import { UserModel } from "../models/UserModel";
 import { AddressModel } from "../models/AddressModel";
 export class UserRepository extends DBOperation {
   constructor() {

@@ -1,4 +1,7 @@
+//! LIBRARY
 import { Length } from "class-validator";
+
+//! DTO
 import { LoginInput } from "./LoginInput";
 
 export class SignupInput extends LoginInput {

@@ -1,25 +1,14 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Payment = exports.Cart = exports.Profile = exports.Verify = exports.Login = exports.Signup = void 0;
+exports.GetProfile = exports.EditProfile = exports.CreateProfile = exports.Verify = exports.GetVerificationCode = exports.Login = exports.Signup = void 0;
 const core_1 = __importDefault(require("@middy/core"));
 const http_json_body_parser_1 = __importDefault(require("@middy/http-json-body-parser"));
 const tsyringe_1 = require("tsyringe");
 // //! SERVICE
 const userService_1 = require("../service/userService");
-// //! UTILS
-const response_1 = require("../utility/response");
 const service = tsyringe_1.container.resolve(userService_1.UserService);
 /**
 * @author Nguyễn Tiến Tài
@@ -55,65 +44,92 @@ exports.Signup = (0, core_1.default)((event) => {
 exports.Login = (0, core_1.default)((event) => {
     return service.UserLogin(event);
 }).use((0, http_json_body_parser_1.default)());
-const Verify = (event) => __awaiter(void 0, void 0, void 0, function* () {
-    const httpMethod = event.requestContext.http.method.toLowerCase();
-    if (httpMethod === "post") {
-        return service.VerifyUser(event);
-    }
-    else if (httpMethod === "get") {
-        return service.GetVerificationToken(event);
-    }
-    else {
-        return (0, response_1.ErrorResponse)(404, "requested method is not supported!");
-    }
-});
-exports.Verify = Verify;
-const Profile = (event) => __awaiter(void 0, void 0, void 0, function* () {
-    const httpMethod = event.requestContext.http.method.toLowerCase();
-    if (httpMethod === "post") {
-        return service.CreateProfile(event);
-    }
-    else if (httpMethod === "put") {
-        return service.EditProfile(event);
-    }
-    else if (httpMethod === "get") {
-        return service.GetProfile(event);
-    }
-    else {
-        return (0, response_1.ErrorResponse)(404, "requested method is not supported!");
-    }
-});
-exports.Profile = Profile;
-const Cart = (event) => __awaiter(void 0, void 0, void 0, function* () {
-    const httpMethod = event.requestContext.http.method.toLowerCase();
-    if (httpMethod === "post") {
-        return service.CreateCart(event);
-    }
-    else if (httpMethod === "put") {
-        return service.UpdateCart(event);
-    }
-    else if (httpMethod === "get") {
-        return service.GetCart(event);
-    }
-    else {
-        return (0, response_1.ErrorResponse)(404, "requested method is not supported!");
-    }
-});
-exports.Cart = Cart;
-const Payment = (event) => __awaiter(void 0, void 0, void 0, function* () {
-    const httpMethod = event.requestContext.http.method.toLowerCase();
-    if (httpMethod === "post") {
-        return service.CreatePaymentMethod(event);
-    }
-    else if (httpMethod === "put") {
-        return service.UpdatePaymentMethod(event);
-    }
-    else if (httpMethod === "get") {
-        return service.GetPaymentMethod(event);
-    }
-    else {
-        return (0, response_1.ErrorResponse)(404, "requested method is not supported!");
-    }
-});
-exports.Payment = Payment;
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @returns {String} message - return success
+* @description GetVerification Code
+*/
+exports.GetVerificationCode = (0, core_1.default)((event) => {
+    return service.GetVerificationToken(event);
+}).use((0, http_json_body_parser_1.default)());
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {Number} code - Code example 123456
+* @param {Object} res - response
+* @returns {String} message - return success
+* @description Verify code
+*/
+exports.Verify = (0, core_1.default)((event) => {
+    return service.VerifyUser(event);
+}).use((0, http_json_body_parser_1.default)());
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {String} firstName - FirstName
+* @param {String} lastName - LastName
+* @param {String} userType - UserType example BUYER
+* @param {Object} address - Address {}
+* @param {String} address.addressLine1 - AddressLine1
+* @param {String} address.addressLine2 - AddressLine2
+* @param {String} address.city - City
+* @param {String} address.postCode - PostCode
+* @param {String} address.country - Country
+* @param {Object} res - response
+* @returns {Object} data - data {}
+* @returns {String} data.message - return message profile created!
+* @returns {String} message - return success
+* @description Create Profile
+*/
+exports.CreateProfile = (0, core_1.default)((event) => {
+    return service.CreateProfile(event);
+}).use((0, http_json_body_parser_1.default)());
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {String} firstName - FirstName
+* @param {String} lastName - LastName
+* @param {String} userType - UserType example BUYER
+* @param {Object} address - Address {}
+* @param {String} address.id - id
+* @param {String} address.addressLine1 - AddressLine1
+* @param {String} address.addressLine2 - AddressLine2
+* @param {String} address.city - City
+* @param {String} address.postCode - PostCode
+* @param {String} address.country - Country
+* @param {Object} res - response
+* @returns {Object} data - data {}
+* @returns {String} data.message - return message profile updated!
+* @returns {String} message - return success
+* @description Edit Profile
+*/
+exports.EditProfile = (0, core_1.default)((event) => {
+    return service.EditProfile(event);
+}).use((0, http_json_body_parser_1.default)());
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {Object} res - response
+* @returns {Object} data - data {}
+* @returns {String} data.first_name - return first_name
+* @returns {String} data.last_name - return last_name
+* @returns {String} data.email - return email
+* @returns {String} data.phone - return phone
+* @returns {String} data.first_name - return first_name
+* @returns {String} data.user_type - return user_type
+* @returns {String} data.verified - return verified
+* @returns {Object} data.address - return address {}
+* @returns {String} data.address.id - return id
+* @returns {String} data.address.address_line1 - return address_line1
+* @returns {String} data.address.address_line2 - return address_line2
+* @returns {String} data.address.city - return city
+* @returns {Number} data.address.post_code - return post_code
+* @returns {String} data.address.country - return country
+* @returns {String} message - return success
+* @description Get Profile
+*/
+exports.GetProfile = (0, core_1.default)((event) => {
+    return service.GetProfile(event);
+}).use((0, http_json_body_parser_1.default)());
 //# sourceMappingURL=userHandler.js.map

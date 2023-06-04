@@ -33,6 +33,7 @@ const userRepository_1 = require("../repository/userRepository");
 const SignupInput_1 = require("../models/dto/SignupInput");
 const LoginInput_1 = require("../models/dto/LoginInput");
 const UpdateInput_1 = require("../models/dto/UpdateInput");
+const AddressInput_1 = require("../models/dto/AddressInput");
 let UserService = class UserService {
     constructor(repository) {
         this.repository = repository;
@@ -71,7 +72,9 @@ let UserService = class UserService {
                 if (error)
                     return (0, response_1.ErrorResponse)(404, error);
                 const data = yield this.repository.findAccount(input.email);
+                console.log(data, data);
                 const verified = yield (0, passsword_1.ValidatePassword)(input.password, data.password, data.salt);
+                console.log(verified, verified);
                 if (!verified) {
                     throw new Error("password does not match!");
                 }
@@ -134,17 +137,61 @@ let UserService = class UserService {
     // User profile
     CreateProfile(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from Create User Profile" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, passsword_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(403, "authorization failed!");
+                const input = (0, class_transformer_1.plainToClass)(AddressInput_1.ProfileInput, event.body);
+                const error = yield (0, errors_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(404, error);
+                console.log(payload, '-----', input);
+                const result = yield this.repository.createProfile(payload.user_id, input);
+                return (0, response_1.SuccessResponse)({ message: "profile created!" });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(500, error);
+            }
         });
     }
+    // Get Profile
     GetProfile(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from Get User Profile" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, passsword_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(403, "authorization failed!");
+                const result = yield this.repository.getUserProfile(payload.user_id);
+                return (0, response_1.SuccessResponse)(result);
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(500, error);
+            }
         });
     }
+    // Edit Profile
     EditProfile(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, response_1.SuccessResponse)({ message: "response from Edit User Profile" });
+            try {
+                const token = event.headers.authorization;
+                const payload = yield (0, passsword_1.VerifyToken)(token);
+                if (!payload)
+                    return (0, response_1.ErrorResponse)(403, "authorization failed!");
+                const input = (0, class_transformer_1.plainToClass)(AddressInput_1.ProfileInput, event.body);
+                const error = yield (0, errors_1.AppValidationError)(input);
+                if (error)
+                    return (0, response_1.ErrorResponse)(404, error);
+                yield this.repository.editProfile(payload.user_id, input);
+                return (0, response_1.SuccessResponse)({ message: "profile updated!" });
+            }
+            catch (error) {
+                console.log(error);
+                return (0, response_1.ErrorResponse)(500, error);
+            }
         });
     }
     // Cart Section

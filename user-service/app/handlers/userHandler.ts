@@ -50,52 +50,99 @@ export const Login = middy((event: APIGatewayProxyEventV2) => {
 }).use(bodyParser());
 
 
-export const Verify = async (event: APIGatewayProxyEventV2) => {
-  const httpMethod = event.requestContext.http.method.toLowerCase();
-  if (httpMethod === "post") {
-    return service.VerifyUser(event);
-  } else if (httpMethod === "get") {
-    return service.GetVerificationToken(event);
-  } else {
-    return ErrorResponse(404, "requested method is not supported!");
-  }
-};
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @returns {String} message - return success
+* @description GetVerification Code
+*/
+export const GetVerificationCode = middy((event: APIGatewayProxyEventV2) => {
+  return service.GetVerificationToken(event);
+}).use(bodyParser());
 
-export const Profile = async (event: APIGatewayProxyEventV2) => {
-  const httpMethod = event.requestContext.http.method.toLowerCase();
-  if (httpMethod === "post") {
-    return service.CreateProfile(event);
-  } else if (httpMethod === "put") {
-    return service.EditProfile(event);
-  } else if (httpMethod === "get") {
-    return service.GetProfile(event);
-  } else {
-    return ErrorResponse(404, "requested method is not supported!");
-  }
-};
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {Number} code - Code example 123456
+* @param {Object} res - response
+* @returns {String} message - return success
+* @description Verify code
+*/
+export const Verify = middy((event: APIGatewayProxyEventV2) => {
+  return service.VerifyUser(event);
+}).use(bodyParser());
 
-export const Cart = async (event: APIGatewayProxyEventV2) => {
-  const httpMethod = event.requestContext.http.method.toLowerCase();
-  if (httpMethod === "post") {
-    return service.CreateCart(event);
-  } else if (httpMethod === "put") {
-    return service.UpdateCart(event);
-  } else if (httpMethod === "get") {
-    return service.GetCart(event);
-  } else {
-    return ErrorResponse(404, "requested method is not supported!");
-  }
-};
 
-export const Payment = async (event: APIGatewayProxyEventV2) => {
-  const httpMethod = event.requestContext.http.method.toLowerCase();
-  if (httpMethod === "post") {
-    return service.CreatePaymentMethod(event);
-  } else if (httpMethod === "put") {
-    return service.UpdatePaymentMethod(event);
-  } else if (httpMethod === "get") {
-    return service.GetPaymentMethod(event);
-  } else {
-    return ErrorResponse(404, "requested method is not supported!");
-  }
-};
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {String} firstName - FirstName
+* @param {String} lastName - LastName
+* @param {String} userType - UserType example BUYER
+* @param {Object} address - Address {}
+* @param {String} address.addressLine1 - AddressLine1
+* @param {String} address.addressLine2 - AddressLine2
+* @param {String} address.city - City
+* @param {String} address.postCode - PostCode
+* @param {String} address.country - Country
+* @param {Object} res - response
+* @returns {Object} data - data {}
+* @returns {String} data.message - return message profile created!
+* @returns {String} message - return success
+* @description Create Profile
+*/
+export const CreateProfile = middy((event: APIGatewayProxyEventV2) => {
+  return service.CreateProfile(event);
+}).use(bodyParser());
+
+
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {String} firstName - FirstName
+* @param {String} lastName - LastName
+* @param {String} userType - UserType example BUYER
+* @param {Object} address - Address {}
+* @param {String} address.id - id
+* @param {String} address.addressLine1 - AddressLine1
+* @param {String} address.addressLine2 - AddressLine2
+* @param {String} address.city - City
+* @param {String} address.postCode - PostCode
+* @param {String} address.country - Country
+* @param {Object} res - response
+* @returns {Object} data - data {}
+* @returns {String} data.message - return message profile updated!
+* @returns {String} message - return success
+* @description Edit Profile
+*/
+export const EditProfile = middy((event: APIGatewayProxyEventV2) => {
+  return service.EditProfile(event);
+}).use(bodyParser());
+
+
+/**
+* @author Nguyễn Tiến Tài
+* @created_at 04/06/2023
+* @param {Object} res - response
+* @returns {Object} data - data {}
+* @returns {String} data.first_name - return first_name
+* @returns {String} data.last_name - return last_name
+* @returns {String} data.email - return email
+* @returns {String} data.phone - return phone
+* @returns {String} data.first_name - return first_name
+* @returns {String} data.user_type - return user_type
+* @returns {String} data.verified - return verified
+* @returns {Object} data.address - return address {}
+* @returns {String} data.address.id - return id 
+* @returns {String} data.address.address_line1 - return address_line1 
+* @returns {String} data.address.address_line2 - return address_line2 
+* @returns {String} data.address.city - return city 
+* @returns {Number} data.address.post_code - return post_code 
+* @returns {String} data.address.country - return country 
+* @returns {String} message - return success
+* @description Get Profile
+*/
+export const GetProfile = middy((event: APIGatewayProxyEventV2) => {
+  return service.GetProfile(event);
+}).use(bodyParser());
+

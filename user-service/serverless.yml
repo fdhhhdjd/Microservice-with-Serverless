@@ -28,19 +28,28 @@ functions:
     events:
       - httpApi:
           path: /verify
-          method: get
+          method: post
+  get-verification-code:
+    handler: app/handler.GetVerificationCode
+    events:
       - httpApi:
           path: /verify
-          method: post
-  profile:
-    handler: app/handler.Profile
+          method: get
+  create-profile:
+    handler: app/handler.CreateProfile
     events:
       - httpApi:
           path: /user
           method: post
+  edit-profile:
+    handler: app/handler.EditProfile
+    events:
       - httpApi:
           path: /user
           method: put
+  get-profile:
+    handler: app/handler.GetProfile
+    events:
       - httpApi:
           path: /user
           method: get

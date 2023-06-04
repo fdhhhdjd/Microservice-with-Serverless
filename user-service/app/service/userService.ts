@@ -26,6 +26,7 @@ import { UserRepository } from "../repository/userRepository";
 import { SignupInput } from "../models/dto/SignupInput";
 import { LoginInput } from "../models/dto/LoginInput";
 import { VerificationInput } from "../models/dto/UpdateInput";
+import { ProfileInput } from "../models/dto/AddressInput";
 
 @autoInjectable()
 export class UserService {
@@ -65,11 +66,13 @@ export class UserService {
       const error = await AppValidationError(input);
       if (error) return ErrorResponse(404, error);
       const data = await this.repository.findAccount(input.email);
+      console.log(data, data);
       const verified = await ValidatePassword(
         input.password,
         data.password,
         data.salt
       );
+      console.log(verified, verified);
       if (!verified) {
         throw new Error("password does not match!");
       }
@@ -134,14 +137,58 @@ export class UserService {
 
   // User profile
   async CreateProfile(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from Create User Profile" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload) return ErrorResponse(403, "authorization failed!");
+
+      const input = plainToClass(ProfileInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(404, error);
+
+      console.log(payload, '-----', input);
+      const result = await this.repository.createProfile(
+        payload.user_id,
+        input
+      );
+      return SuccessResponse({ message: "profile created!" });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(500, error);
+    }
   }
 
+  // Get Profile
   async GetProfile(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from Get User Profile" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload) return ErrorResponse(403, "authorization failed!");
+      const result = await this.repository.getUserProfile(payload.user_id);
+      return SuccessResponse(result);
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(500, error);
+    }
   }
+
+  // Edit Profile
   async EditProfile(event: APIGatewayProxyEventV2) {
-    return SuccessResponse({ message: "response from Edit User Profile" });
+    try {
+      const token = event.headers.authorization;
+      const payload = await VerifyToken(token);
+      if (!payload) return ErrorResponse(403, "authorization failed!");
+
+      const input = plainToClass(ProfileInput, event.body);
+      const error = await AppValidationError(input);
+      if (error) return ErrorResponse(404, error);
+
+      await this.repository.editProfile(payload.user_id, input);
+      return SuccessResponse({ message: "profile updated!" });
+    } catch (error) {
+      console.log(error);
+      return ErrorResponse(500, error);
+    }
   }
 
   // Cart Section
